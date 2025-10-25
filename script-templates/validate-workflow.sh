@@ -86,9 +86,9 @@ main() {
         echo "  GitHub CLI version: $gh_version"
     fi
 
-    check_item "Bash 4.0+" "[ \${BASH_VERSINFO[0]} -ge 4 ]"
+    check_item "Bash 3.2+" "[ \${BASH_VERSINFO[0]} -ge 3 ]"
 
-    if [ "${BASH_VERSINFO[0]}" -ge 4 ]; then
+    if [ "${BASH_VERSINFO[0]}" -ge 3 ]; then
         echo "  Bash version: ${BASH_VERSION}"
     fi
 
