@@ -50,13 +50,34 @@ PHASES=("Phase 1" "Phase 2" "Phase 3" "Phase 4" "Phase 5")
 ./scripts/setup-github-labels.sh
 ```
 
-### 4. Validate Installation
+### 4. **Run End-to-End Tests** ⭐ NEW!
+
+**IMPORTANT**: Before using the integration, run the comprehensive test suite to verify everything works correctly:
+
+```bash
+# Recommended: Full test with auto-cleanup
+./scripts/test-integration.sh --cleanup
+
+# Alternative: Safe dry-run mode (no issues created)
+./scripts/test-integration.sh --dry-run
+```
+
+This validates:
+- ✅ Bash 3.2+ compatibility (macOS support)
+- ✅ GitHub CLI authentication
+- ✅ All bug fixes are working
+- ✅ Issue creation and status updates
+- ✅ Complete workflow integration
+
+See [TESTING.md](TESTING.md) for detailed testing documentation.
+
+### 5. Validate Installation
 
 ```bash
 ./scripts/validate-workflow.sh
 ```
 
-### 5. Create Your First Issue
+### 6. Create Your First Issue
 
 ```bash
 ./scripts/create-feature-issue.sh "My First Feature" "Description here" "Phase 1" "High"
@@ -84,7 +105,8 @@ your-project/
 │   ├── create-bug-issue.sh
 │   ├── update-issue-status.sh
 │   ├── setup-github-labels.sh
-│   └── validate-workflow.sh
+│   ├── validate-workflow.sh
+│   └── test-integration.sh         # Comprehensive test suite ⭐
 └── docs/
     ├── GITHUB_INTEGRATION.md       # Usage guide
     └── AGENTS.md                   # AI agent protocol (optional)
@@ -267,7 +289,7 @@ Script    Working on it    Implementation        Closed
 
 - GitHub CLI (`gh`) version 2.0+
 - Git
-- Bash 4.0+
+- **Bash 3.2+** (macOS compatible! ✅)
 - GitHub repository with issues enabled
 - GitHub token with `repo` and `project` scopes
 

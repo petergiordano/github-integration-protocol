@@ -28,7 +28,7 @@ Complete guide for deploying this GitHub Issues integration system to any reposi
    ```
    Install: https://cli.github.com/
 
-3. **Bash** (version 4.0+)
+3. **Bash** (version 3.2+) - macOS compatible! ✅
    ```bash
    bash --version
    ```
@@ -137,7 +137,73 @@ The installer will ask for:
    - Recommended: yes
    - Creates all labels in GitHub
 
-### Step 5: Verify Installation
+### Step 5: **Run Comprehensive End-to-End Tests** ⭐ CRITICAL!
+
+**BEFORE creating any real issues**, validate the entire system with the comprehensive test suite:
+
+```bash
+# Recommended: Full test with automatic cleanup
+./scripts/test-integration.sh --cleanup
+```
+
+This comprehensive test validates:
+- ✅ **Bash 3.2+ compatibility** - Works on macOS default shell
+- ✅ **GitHub CLI authentication** - Ensures proper API access
+- ✅ **All bug fixes** - Validates 5 critical bug fixes (see TESTING.md)
+- ✅ **Issue creation** - Tests real GitHub issue creation
+- ✅ **Status workflows** - Tests todo → in-progress → complete
+- ✅ **Command quoting** - Multiline and special character handling
+- ✅ **Log isolation** - Clean output without contamination
+
+Expected output:
+```
+╔════════════════════════════════════════════════════════════╗
+║        GitHub Integration Protocol Test Suite             ║
+╚════════════════════════════════════════════════════════════╝
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TEST: Environment & Prerequisites
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✓ PASS: Bash version 3.2+ is >= 3.2 (macOS compatible)
+✓ PASS: GitHub CLI (gh) is installed
+✓ PASS: Git is installed
+✓ PASS: GitHub CLI is authenticated
+✓ PASS: Repository is accessible
+...
+
+╔════════════════════════════════════════════════════════════╗
+║                      Test Summary                          ║
+╚════════════════════════════════════════════════════════════╝
+
+  Total Tests:   10
+  Passed:        45+
+  Failed:        0
+
+✓ All tests passed!
+The GitHub Integration Protocol is working correctly.
+```
+
+Alternative test modes:
+```bash
+# Dry run (safe, no issues created)
+./scripts/test-integration.sh --dry-run
+
+# Full test (creates test issues, requires manual cleanup)
+./scripts/test-integration.sh
+```
+
+**Why this is important:**
+- Prevents issues in production use
+- Validates macOS/Bash 3.2 compatibility
+- Confirms all bug fixes are working
+- Tests actual GitHub API integration
+- Ensures clean issue creation without contamination
+
+See [TESTING.md](TESTING.md) for complete testing documentation.
+
+### Step 6: Basic Validation Check
+
+For a quick sanity check after testing:
 
 ```bash
 ./scripts/validate-workflow.sh
@@ -157,7 +223,7 @@ Configuration:
 1. Prerequisites
   ✓ Git installed
   ✓ GitHub CLI installed
-  ✓ Bash 4.0+
+  ✓ Bash 3.2+
 
 2. GitHub Authentication
   ✓ GitHub CLI authenticated

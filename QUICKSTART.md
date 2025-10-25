@@ -35,7 +35,41 @@ Customize issue prefixes? n
 Run label setup now? y
 ```
 
-### 3. Verify
+### 3. **Run End-to-End Tests** ⭐ IMPORTANT!
+
+**Before creating any real issues**, validate the entire system with the comprehensive test suite:
+
+```bash
+# Recommended: Full test with automatic cleanup
+./scripts/test-integration.sh --cleanup
+```
+
+This test validates:
+- ✅ Bash 3.2+ compatibility (works on macOS!)
+- ✅ GitHub CLI authentication
+- ✅ All recent bug fixes
+- ✅ Issue creation workflow
+- ✅ Status transitions
+- ✅ Command quoting and multiline support
+
+Alternative test modes:
+```bash
+# Dry run (safe, no issues created)
+./scripts/test-integration.sh --dry-run
+
+# Full test (creates test issues, requires manual cleanup)
+./scripts/test-integration.sh
+```
+
+Expected output:
+```
+✓ All tests passed!
+The GitHub Integration Protocol is working correctly.
+```
+
+See [TESTING.md](TESTING.md) for detailed documentation.
+
+### 4. Verify Installation
 
 ```bash
 ./scripts/validate-workflow.sh
@@ -100,6 +134,7 @@ In any GitHub issue, comment:
 ./scripts/update-issue-status.sh "ISSUE-ID" "STATUS"
 ./scripts/setup-github-labels.sh
 ./scripts/validate-workflow.sh
+./scripts/test-integration.sh           # ⭐ Comprehensive test suite
 ```
 
 ## Workflow
@@ -148,6 +183,7 @@ gh auth login  # if not authenticated
 
 ## Next Steps
 
+- **Testing guide**: [TESTING.md](TESTING.md) - Learn about continuous testing
 - **Read full docs**: `docs/GITHUB_INTEGRATION.md`
 - **Customize**: Edit `.github-integration/config.sh`
 - **Deploy guide**: `DEPLOYMENT_GUIDE.md`
