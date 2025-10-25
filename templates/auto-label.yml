@@ -1,0 +1,224 @@
+name: Auto Label Issues
+
+on:
+  issues:
+    types: [opened, edited]
+  issue_comment:
+    types: [created]
+
+jobs:
+  auto-label:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+
+    steps:
+      - name: Auto-label based on title prefixes
+        if: github.event_name == 'issues'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const title = issue.title;
+            const currentLabels = issue.labels.map(l => l.name);
+
+            // Define label mappings (customized during installation)
+            const labelMappings = {
+              '[FEAT-': ['enhancement'],
+              '[ENH-': ['enhancement'],
+              '[BUG-': ['bug']
+            };
+
+            // Check title and add appropriate labels
+            for (const [prefix, labels] of Object.entries(labelMappings)) {
+              if (title.includes(prefix)) {
+                const labelsToAdd = labels.filter(l => !currentLabels.includes(l));
+                if (labelsToAdd.length > 0) {
+                  await github.rest.issues.addLabels({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: issue.number,
+                    labels: labelsToAdd
+                  });
+                  console.log(`Added labels: ${labelsToAdd.join(', ')}`);
+                }
+              }
+            }
+
+            // Auto-add status-todo if no status label exists
+            const statusLabels = ['status-todo', 'status-in-progress', 'status-complete'];
+            if (!currentLabels.some(l => statusLabels.includes(l))) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                labels: ['status-todo']
+              });
+              console.log('Added status-todo label');
+            }
+
+            // Extract phase from title or body (supports Phase 1, Sprint 1, etc.)
+            const phasePattern = /(?:Phase|Sprint|Milestone)\s+(\d+|[A-Za-z\s]+)/i;
+            const phaseMatch = (title + ' ' + issue.body).match(phasePattern);
+            if (phaseMatch) {
+              const phaseLabel = phaseMatch[0];
+              if (!currentLabels.includes(phaseLabel)) {
+                try {
+                  await github.rest.issues.addLabels({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: issue.number,
+                    labels: [phaseLabel]
+                  });
+                  console.log(`Added phase label: ${phaseLabel}`);
+                } catch (error) {
+                  console.log(`Phase label ${phaseLabel} might not exist, skipping`);
+                }
+              }
+            }
+
+      - name: Handle status update comments
+        if: github.event_name == 'issue_comment' && github.event.action == 'created'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const comment = context.payload.comment;
+            const issue = context.payload.issue;
+            const body = comment.body.toLowerCase();
+
+            // Only process comments that start with /status
+            if (!body.startsWith('/status')) {
+              return;
+            }
+
+            // Extract the new status
+            const statusMap = {
+              'todo': 'status-todo',
+              'in-progress': 'status-in-progress',
+              'in progress': 'status-in-progress',
+              'inprogress': 'status-in-progress',
+              'wip': 'status-in-progress',
+              'done': 'status-complete',
+              'complete': 'status-complete',
+              'completed': 'status-complete',
+              'closed': 'status-complete'
+            };
+
+            let newStatus = null;
+            for (const [keyword, label] of Object.entries(statusMap)) {
+              if (body.includes(keyword)) {
+                newStatus = label;
+                break;
+              }
+            }
+
+            if (!newStatus) {
+              // Add a reaction to indicate command not understood
+              await github.rest.reactions.createForIssueComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: comment.id,
+                content: 'confused'
+              });
+              return;
+            }
+
+            // Remove all existing status labels
+            const statusLabels = ['status-todo', 'status-in-progress', 'status-complete'];
+            const currentLabels = issue.labels.map(l => l.name);
+
+            for (const label of statusLabels) {
+              if (currentLabels.includes(label)) {
+                await github.rest.issues.removeLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  name: label
+                });
+              }
+            }
+
+            // Add the new status label
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              labels: [newStatus]
+            });
+
+            // Add a reaction to confirm the update
+            await github.rest.reactions.createForIssueComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: comment.id,
+              content: 'rocket'
+            });
+
+            console.log(`Updated status to: ${newStatus}`);
+
+      - name: Handle priority update comments
+        if: github.event_name == 'issue_comment' && github.event.action == 'created'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const comment = context.payload.comment;
+            const issue = context.payload.issue;
+            const body = comment.body.toLowerCase();
+
+            // Only process comments that start with /priority
+            if (!body.startsWith('/priority')) {
+              return;
+            }
+
+            // Extract the new priority
+            const priorityMap = {
+              'high': 'priority-high',
+              'medium': 'priority-medium',
+              'med': 'priority-medium',
+              'low': 'priority-low'
+            };
+
+            let newPriority = null;
+            for (const [keyword, label] of Object.entries(priorityMap)) {
+              if (body.includes(keyword)) {
+                newPriority = label;
+                break;
+              }
+            }
+
+            if (!newPriority) {
+              return;
+            }
+
+            // Remove all existing priority labels
+            const priorityLabels = ['priority-high', 'priority-medium', 'priority-low'];
+            const currentLabels = issue.labels.map(l => l.name);
+
+            for (const label of priorityLabels) {
+              if (currentLabels.includes(label)) {
+                await github.rest.issues.removeLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  name: label
+                });
+              }
+            }
+
+            // Add the new priority label
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              labels: [newPriority]
+            });
+
+            // Add a reaction to confirm the update
+            await github.rest.reactions.createForIssueComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: comment.id,
+              content: '+1'
+            });
+
+            console.log(`Updated priority to: ${newPriority}`);

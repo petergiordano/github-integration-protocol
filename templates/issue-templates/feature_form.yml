@@ -1,0 +1,85 @@
+name: Feature Request
+description: Propose a new feature for the project
+title: "[FEAT-XXX]: "
+labels: ["enhancement", "status-todo"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Feature Request Form
+        Use this form to propose a new feature. The ID will be auto-generated.
+
+  - type: input
+    id: title
+    attributes:
+      label: Feature Title
+      description: A clear, concise title for this feature
+      placeholder: "User authentication system"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Describe the feature and its purpose
+      placeholder: "Implement OAuth-based authentication to allow users to log in with Google and GitHub accounts."
+    validations:
+      required: true
+
+  - type: dropdown
+    id: phase
+    attributes:
+      label: Phase
+      description: Which development phase is this for?
+      options:
+        - Phase 1
+        - Phase 2
+        - Phase 3
+        - Phase 4
+        - Phase 5
+        - Backlog
+    validations:
+      required: false
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How important is this feature?
+      options:
+        - High
+        - Medium
+        - Low
+      default: 1
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: acceptance_criteria
+    attributes:
+      label: Acceptance Criteria
+      description: What needs to be done for this feature to be complete?
+      options:
+        - label: Implementation is complete and working
+        - label: Code follows project standards
+        - label: Tests are passing
+        - label: Documentation is updated
+
+  - type: textarea
+    id: additional_criteria
+    attributes:
+      label: Additional Acceptance Criteria
+      description: Any additional criteria specific to this feature
+      placeholder: "- [ ] Custom criterion here"
+    validations:
+      required: false
+
+  - type: textarea
+    id: technical_notes
+    attributes:
+      label: Technical Notes
+      description: Any technical considerations or implementation details
+      placeholder: "Consider using Passport.js for OAuth integration"
+    validations:
+      required: false

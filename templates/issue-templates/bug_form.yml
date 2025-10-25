@@ -1,0 +1,87 @@
+name: Bug Report
+description: Report a bug that needs fixing
+title: "[BUG-XXX]: "
+labels: ["bug", "status-todo", "priority-high"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Bug Report Form
+        Use this form to report a bug. The ID will be auto-generated.
+
+  - type: input
+    id: title
+    attributes:
+      label: Bug Title
+      description: A clear, concise title for this bug
+      placeholder: "Login button not responding"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: Describe the bug and what should happen instead
+      placeholder: "When clicking the login button, nothing happens. Expected: User should be redirected to login page."
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps_to_reproduce
+    attributes:
+      label: Steps to Reproduce
+      description: How can we reproduce this bug?
+      placeholder: |
+        1. Go to homepage
+        2. Click login button
+        3. Observe that nothing happens
+    validations:
+      required: true
+
+  - type: dropdown
+    id: phase
+    attributes:
+      label: Phase
+      description: Which development phase is this related to?
+      options:
+        - Phase 1
+        - Phase 2
+        - Phase 3
+        - Phase 4
+        - Phase 5
+    validations:
+      required: false
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How severe is this bug?
+      options:
+        - High (Blocking)
+        - Medium (Important)
+        - Low (Minor)
+      default: 0
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: acceptance_criteria
+    attributes:
+      label: Acceptance Criteria (Fix Requirements)
+      description: What needs to be done to fix this bug?
+      options:
+        - label: Bug is reproducible
+        - label: Root cause identified
+        - label: Fix implemented and tested
+        - label: Regression tests added
+
+  - type: textarea
+    id: additional_info
+    attributes:
+      label: Additional Information
+      description: Any other relevant information (browser, OS, screenshots, etc.)
+      placeholder: "Browser: Chrome 120, OS: macOS 14"
+    validations:
+      required: false
